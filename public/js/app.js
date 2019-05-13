@@ -1792,10 +1792,18 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      edit: true,
+      edit: false,
       list: [],
       contact: {
         id: '',
@@ -1806,16 +1814,67 @@ __webpack_require__.r(__webpack_exports__);
     };
   },
   mounted: function mounted() {
-    console.log('Contacts Components Loaded');
+    console.log('Contacts Components Loaded...');
+    this.fetchContactList();
   },
   methods: {
-    createContact: function createContact() {
-      console.log('createContact');
-      return;
+    fetchContactList: function fetchContactList() {
+      var _this = this;
+
+      console.log('Fetching Contacts...');
+      axios.get('api/contacts').then(function (response) {
+        console.log(response.data);
+        _this.list = response.data;
+      })["catch"](function (error) {
+        console.log(error);
+      });
     },
-    updateContact: function updateContact() {
-      console.log('updateContact ' + id);
-      return;
+    createContact: function createContact() {
+      console.log('createContact...');
+      var self = this;
+      var params = Object.assign({}, self.contact);
+      axios.post('api/contact/store', params).then(function () {
+        self.contact.name = '';
+        self.contact.email = '';
+        self.contact.phone = '';
+        self.edit = false;
+        self.fetchContactList();
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    showContact: function showContact(id) {
+      var self = this;
+      axios.get('api/contact/' + id).then(function (response) {
+        self.contact.id = response.data.id;
+        self.contact.name = response.data.name;
+        self.contact.email = response.data.email;
+        self.contact.phone = response.data.phone;
+      });
+      self.edit = true;
+    },
+    updateContact: function updateContact(id) {
+      console.log('updating Contact... ' + id);
+      var self = this;
+      var params = Object.assign({}, self.contact);
+      axios.patch('api/contact/' + id, params).then(function () {
+        self.contact.name = '';
+        self.contact.email = '';
+        self.contact.phone = '';
+        self.edit = false;
+        self.fetchContactList();
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    deleteContact: function deleteContact(id) {
+      console.log('Deleting Contact... ' + id);
+      var self = this;
+      axios["delete"]('api/contact/' + id).then(function () {
+        self.fetchContactList();
+      })["catch"](function (error) {
+        console.log(error);
+      });
     }
   }
 });
@@ -37122,7 +37181,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("h1", [_vm._v("Contacts")]),
+    _c("h1", [_vm._v("Add Contact")]),
     _vm._v(" "),
     _c(
       "form",
@@ -37250,6 +37309,51 @@ var render = function() {
           )
         ])
       ]
+    ),
+    _vm._v(" "),
+    _c("h1", [_vm._v("Contacts")]),
+    _vm._v(" "),
+    _c(
+      "ul",
+      { staticClass: "list-group" },
+      _vm._l(_vm.list, function(contact) {
+        return _c("li", { staticClass: "list-group-item" }, [
+          _c("strong", [_vm._v(_vm._s(contact.name))]),
+          _vm._v(
+            " " +
+              _vm._s(contact.email) +
+              " " +
+              _vm._s(contact.phone) +
+              "\n           "
+          ),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary btn-xs",
+              on: {
+                click: function($event) {
+                  return _vm.showContact(contact.id)
+                }
+              }
+            },
+            [_vm._v("Edit")]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-danger btn-xs",
+              on: {
+                click: function($event) {
+                  return _vm.deleteContact(contact.id)
+                }
+              }
+            },
+            [_vm._v("Delete")]
+          )
+        ])
+      }),
+      0
     )
   ])
 }
@@ -49420,7 +49524,9 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
  */
 // const files = require.context('./', true, /\.vue$/i);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
-// Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+
+var axios = __webpack_require__(/*! axios */ "./node_modules/axios/index.js"); // Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+
 
 Vue.component('contacts', __webpack_require__(/*! ./components/Contacts.vue */ "./resources/js/components/Contacts.vue")["default"]);
 /**

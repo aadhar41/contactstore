@@ -17,17 +17,17 @@ use App\Contact;
 Route::group(['middleware' => 'api'], function(){
     // Fetch Contacts
     Route::get('contacts', function(){
-        return Contact::lastest()->orderBy('created_at', 'desc')->get();
+        return Contact::latest()->orderBy('created_at', 'desc')->get();
     });
 
-    // Get Single Conatact
-    Route::get('conatct/{id}', function(){
-        return Conatct::findOrFail($id);
+    // Get Single Contact
+    Route::get('contact/{id}', function($id){
+        return Contact::findOrFail($id);
     });
 
     // Add Contact
     Route::post('contact/store', function(Request $request){
-        return Conatct::create(['name' => $request->input(['name']),'email' => $request->input(['email']),'phone' => $request->input(['phone'])]);
+        return Contact::create(['name' => $request->input(['name']), 'email' => $request->input(['email']), 'phone' => $request->input(['phone'])]);
     });
 
     // Update Conatact
@@ -35,9 +35,9 @@ Route::group(['middleware' => 'api'], function(){
         Contact::findOrFail($id)->update(['name' => $request->input(['name']),'email' => $request->input(['email']),'phone' => $request->input(['phone'])]);
     });
 
-    // Delete Conatct
+    // Delete Contact
     Route::delete('contact/{id}', function($id){
-        return Contact::destory($id);
+        return Contact::destroy($id);
     });
 
 });
